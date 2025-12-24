@@ -6,18 +6,6 @@ A modern insurance risk assessment and underwriting system.  built with **React 
 
 ---
 
-## 📋 Table of Contents
-- [Project Overview](#project-overview)
-- [Folder Structure](#folder-structure)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Development Guide](#development-guide)
-- [Git Workflow](#git-workflow)
-- [Team Instructions](#team-instructions)
-- [Dummy Data](#dummy-data)
-
----
 
 ## 🎯 Project Overview
 
