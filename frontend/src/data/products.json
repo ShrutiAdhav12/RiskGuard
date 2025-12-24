@@ -1,0 +1,46 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Life Insurance",
+      "type": "life",
+      "icon": "❤️",
+      "description": "Comprehensive life insurance with flexible coverage options and competitive rates.",
+      "features": [
+        "Term & Whole Life",
+        "Accidental Death Benefit",
+        "Fast Underwriting"
+      ],
+      "basePrice": 4200,
+      "maxCoverage": 83000000
+    },
+    {
+      "id": 2,
+      "name": "Health Insurance",
+      "type": "health",
+      "icon": "⚕️",
+      "description": "Extensive health coverage designed to protect you and your family from medical expenses.",
+      "features": [
+        "Hospital Coverage",
+        "Preventive Care",
+        "Pre-existing Conditions"
+      ],
+      "basePrice": 16600,
+      "maxCoverage": 41500000
+    },
+    {
+      "id": 3,
+      "name": "Motor Insurance",
+      "type": "motor",
+      "icon": "🚗",
+      "description": "Reliable motor insurance protecting your vehicle against all risks and damages.",
+      "features": [
+        "Third-party Liability",
+        "Own Damage Coverage",
+        "Cashless Repairs"
+      ],
+      "basePrice": 12450,
+      "maxCoverage": 8300000
+    }
+  ]
+}

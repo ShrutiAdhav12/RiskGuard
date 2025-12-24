@@ -1,0 +1,56 @@
+{
+  "applications": [
+    {
+      "id": "APP001",
+      "customerId": 1,
+      "productId": 1,
+      "productName": "Life Insurance",
+      "status": "approved",
+      "riskScore": 4.5,
+      "submittedDate": "2024-01-10",
+      "reviewedDate": "2024-01-15",
+      "reviewedBy": 101,
+      "coverageRequested": 500000,
+      "notes": "Low risk applicant. Approved with standard rates."
+    },
+    {
+      "id": "APP002",
+      "customerId": 1,
+      "productId": 2,
+      "productName": "Health Insurance",
+      "status": "pending",
+      "riskScore": 6.2,
+      "submittedDate": "2024-01-28",
+      "reviewedDate": null,
+      "reviewedBy": null,
+      "coverageRequested": 300000,
+      "notes": "Awaiting medical records"
+    },
+    {
+      "id": "APP003",
+      "customerId": 2,
+      "productId": 3,
+      "productName": "Motor Insurance",
+      "status": "approved",
+      "riskScore": 5.0,
+      "submittedDate": "2024-03-05",
+      "reviewedDate": "2024-03-10",
+      "reviewedBy": 101,
+      "coverageRequested": 100000,
+      "notes": "Standard motor insurance. Approved."
+    },
+    {
+      "id": "APP004",
+      "customerId": 3,
+      "productId": 1,
+      "productName": "Life Insurance",
+      "status": "under_review",
+      "riskScore": 7.8,
+      "submittedDate": "2024-12-20",
+      "reviewedDate": null,
+      "reviewedBy": 102,
+      "coverageRequested": 750000,
+      "notes": "High risk score. Requires additional investigation."
+    }
+  ]
+}

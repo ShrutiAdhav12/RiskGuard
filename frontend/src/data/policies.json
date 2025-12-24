@@ -1,0 +1,60 @@
+{
+  "policies": [
+    {
+      "id": "POL001",
+      "customerId": 1,
+      "productId": 1,
+      "productName": "Life Insurance",
+      "status": "active",
+      "startDate": "2024-01-15",
+      "endDate": "2025-01-15",
+      "coverageAmount": 41500000,
+      "premiumAmount": 12450,
+      "premiumFrequency": "monthly",
+      "nextPaymentDate": "2025-01-10",
+      "policyNumber": "LI-2024-0001"
+    },
+    {
+      "id": "POL002",
+      "customerId": 1,
+      "productId": 2,
+      "productName": "Health Insurance",
+      "status": "active",
+      "startDate": "2024-02-01",
+      "endDate": "2025-02-01",
+      "coverageAmount": 24900000,
+      "premiumAmount": 20750,
+      "premiumFrequency": "monthly",
+      "nextPaymentDate": "2025-01-05",
+      "policyNumber": "HI-2024-0005"
+    },
+    {
+      "id": "POL003",
+      "customerId": 2,
+      "productId": 3,
+      "productName": "Motor Insurance",
+      "status": "active",
+      "startDate": "2024-03-10",
+      "endDate": "2025-03-10",
+      "coverageAmount": 8300000,
+      "premiumAmount": 9960,
+      "premiumFrequency": "monthly",
+      "nextPaymentDate": "2025-01-15",
+      "policyNumber": "MI-2024-0012"
+    },
+    {
+      "id": "POL004",
+      "customerId": 3,
+      "productId": 1,
+      "productName": "Life Insurance",
+      "status": "pending",
+      "startDate": "2025-02-01",
+      "endDate": "2026-02-01",
+      "coverageAmount": 62250000,
+      "premiumAmount": 16600,
+      "premiumFrequency": "quarterly",
+      "nextPaymentDate": "2025-02-01",
+      "policyNumber": "LI-2024-0002"
+    }
+  ]
+}
