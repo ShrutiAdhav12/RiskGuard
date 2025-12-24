@@ -203,25 +203,6 @@ git push origin --delete feature/your-feature-name
 
 #### Common Issues & Solutions
 
-**Issue: "Port 5173 already in use"**
-```bash
-# Find and kill process on port 5173
-# Windows PowerShell:
-netstat -ano | findstr :5173
-taskkill /PID <PID> /F
-
-# Mac/Linux:
-lsof -i :5173
-kill -9 <PID>
-```
-
-**Issue: "npm install fails"**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
 **Issue: "Git merge conflicts"**
 ```bash
 # View conflicts
