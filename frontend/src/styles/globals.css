@@ -537,14 +537,14 @@ label {
 
 /* Action Button */
 .action-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   background-color: #0066cc;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
 }
@@ -777,4 +777,371 @@ label {
 .footer-links span {
   color: #ccc;
   font-size: 0.9rem;
+}
+/* Dashboard Styles */
+
+/* Glass Morphism Stat Cards */
+.stat-card-glass {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Circular Icon Boxes */
+.stat-icon-blue {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #0066cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-icon-green {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-icon-amber {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-icon-red {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Quick Actions Container */
+.quick-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* Alert Messages */
+.success-message {
+  background-color: #d1fae5;
+  border: 1px solid #6ee7b7;
+  color: #047857;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.warning-message {
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.info-message {
+  background-color: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+/* Data List Items */
+.data-item {
+  border-left: 4px solid #0066cc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.data-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.data-item-title {
+  margin: 0;
+  color: #004499;
+  font-size: 1rem;
+}
+
+.data-item-text {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Status Badges */
+.status-badge {
+  background-color: #10b981;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #f59e0b;
+}
+
+.status-badge.rejected {
+  background-color: #ef4444;
+}
+
+/* User Statistics Grid */
+.user-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-box {
+  padding: 1rem;
+  background-color: white;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.stat-box-number {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.stat-box-label {
+  margin: 0.5rem 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stat-box-blue .stat-box-number {
+  color: #0066cc;
+}
+
+.stat-box-amber .stat-box-number {
+  color: #f59e0b;
+}
+
+.stat-box-red .stat-box-number {
+  color: #ef4444;
+}
+
+/* User List Item */
+.user-list-item {
+  border-left: 4px solid #0066cc;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background-color: white;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  margin: 0;
+  color: #004499;
+  font-size: 1rem;
+}
+
+.user-email {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.role-badge {
+  background-color: #0066cc;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.underwriter {
+  background-color: #f59e0b;
+}
+
+.role-badge.admin {
+  background-color: #ef4444;
+}
+
+/* Glass Morphism Role Badge */
+.role-badge-glass {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+.role-badge-glass.customer {
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.2) 0%, rgba(0, 102, 204, 0.05) 100%);
+  border-color: rgba(0, 102, 204, 0.3);
+  color: #0066cc;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.15);
+}
+
+.role-badge-glass.underwriter {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+}
+
+.role-badge-glass.admin {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+}
+
+/* Glass Morphism Button */
+.btn-glass {
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-glass:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-glass.primary {
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.2) 0%, rgba(0, 102, 204, 0.05) 100%);
+  border-color: rgba(0, 102, 204, 0.3);
+  color: #0066cc;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.15);
+}
+
+.btn-glass.primary:hover {
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.3) 0%, rgba(0, 102, 204, 0.1) 100%);
+  border-color: rgba(0, 102, 204, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.2);
+}
+
+/* Glass Morphism Risk Badge */
+.risk-badge-glass {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.risk-badge-glass.low {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+}
+
+.risk-badge-glass.medium {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+}
+
+.risk-badge-glass.high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+}
+
+/* Glass Morphism Status Badge */
+.status-badge-glass {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge-glass.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+}
+
+.status-badge-glass.pending {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
 }

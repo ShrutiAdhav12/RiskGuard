@@ -1,7 +1,65 @@
+import { useState } from 'react'
 import Header from '../common/Header'
 import Footer from '../common/Footer'
+import usersData from '../../data/users.json'
 
 function AdminDashboard() {
+  // State: track which role is selected for filtering
+  let [selectedRole, setSelectedRole] = useState(null)
+  
+  // Combine all users from JSON data
+  let allUsers = []
+  for (let i = 0; i < usersData.customers.length; i++) {
+    allUsers.push(usersData.customers[i])
+  }
+  for (let i = 0; i < usersData.underwriters.length; i++) {
+    allUsers.push(usersData.underwriters[i])
+  }
+  for (let i = 0; i < usersData.admins.length; i++) {
+    allUsers.push(usersData.admins[i])
+  }
+
+  // Toggle filter - show customers or show all
+  function handleUserManagement() {
+    if (selectedRole === null) {
+      setSelectedRole('customer')
+    } else {
+      setSelectedRole(null)
+    }
+  }
+
+  // Filter users based on selected role
+  let displayedUsers = []
+  if (selectedRole !== null) {
+    // Only show users with the selected role
+    for (let i = 0; i < allUsers.length; i++) {
+      if (allUsers[i].role === selectedRole) {
+        displayedUsers.push(allUsers[i])
+      }
+    }
+  } else {
+    // Show all users
+    for (let i = 0; i < allUsers.length; i++) {
+      displayedUsers.push(allUsers[i])
+    }
+  }
+  
+  // Count each role type
+  let totalUsers = allUsers.length
+  let customers = usersData.customers.length
+  let underwriters = usersData.underwriters.length
+  let admins = usersData.admins.length
+
+  // Get the CSS class name for user role
+  function getRoleClass(role) {
+    if (role === 'customer') {
+      return 'customer'
+    } else if (role === 'underwriter') {
+      return 'underwriter'
+    } else {
+      return 'admin'
+    }
+  }
   return (
     <>
       <Header />
@@ -11,31 +69,31 @@ function AdminDashboard() {
           <p className="page-subtitle">System management and analytics</p>
 
           <div className="grid grid-4">
-            <div className="stat-card">
-              <div className="stat-icon">📊</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-blue">▦</div>
               <div>
                 <h3 className="stat-number">1,245</h3>
                 <p className="stat-label">Total Applications</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">📈</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-green">▲</div>
               <div>
                 <h3 className="stat-number">92%</h3>
                 <p className="stat-label">Approval Rate</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">⚖️</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-amber">⚖</div>
               <div>
                 <h3 className="stat-number">6.2</h3>
                 <p className="stat-label">Avg Risk Score</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">👥</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-red">◉</div>
               <div>
-                <h3 className="stat-number">234</h3>
+                <h3 className="stat-number">{totalUsers}</h3>
                 <p className="stat-label">Active Users</p>
               </div>
             </div>
@@ -43,123 +101,59 @@ function AdminDashboard() {
 
           <div style={{marginBottom: '2rem'}}>
             <h2 className="section-title">Admin Tools</h2>
-            <div className="grid grid-2">
-              <button className="action-btn">User Management</button>
-              <button className="action-btn">Product Management</button>
-              <button className="action-btn">Analytics & Reports</button>
-              <button className="action-btn">System Settings</button>
+            <div className="quick-actions">
+              <button className="btn-glass primary" onClick={handleUserManagement}>{selectedRole ? 'Show All Users' : 'Filter by Customers'}</button>
+              <button className="btn-glass primary">Product Management</button>
+              <button className="btn-glass primary">Analytics & Reports</button>
+              <button className="btn-glass primary">System Settings</button>
             </div>
           </div>
 
           <div className="placeholder-section">
-            <h2 className="section-title">System Analytics</h2>
-            <p className="placeholder-text">System analytics and reports will appear here</p>
+            <h2 className="section-title">User Statistics</h2>
+            <div className="user-stats-grid">
+              <div className="stat-box stat-box-blue">
+                <h3 className="stat-box-number">{customers}</h3>
+                <p className="stat-box-label">Customers</p>
+              </div>
+              <div className="stat-box stat-box-amber">
+                <h3 className="stat-box-number">{underwriters}</h3>
+                <p className="stat-box-label">Underwriters</p>
+              </div>
+              <div className="stat-box stat-box-red">
+                <h3 className="stat-box-number">{admins}</h3>
+                <p className="stat-box-label">Admins</p>
+              </div>
+            </div>
           </div>
 
+          {selectedRole && (
+            <div className="info-message">✓ Showing {selectedRole}s only ({displayedUsers.length})</div>
+          )}
+
           <div className="placeholder-section">
-            <h2 className="section-title">User Activity Log</h2>
-            <p className="placeholder-text">Recent user activities will be displayed here</p>
+            <h2 className="section-title">System Users ({displayedUsers.length})</h2>
+            <div style={{marginTop: '1rem'}}>
+              {displayedUsers.map(function(user) {
+                let roleClass = getRoleClass(user.role)
+                
+                return (
+                  <div key={user.id} className="user-list-item">
+                    <div className="user-info">
+                      <h3 className="user-name">{user.name}</h3>
+                      <p className="user-email">{user.email}</p>
+                    </div>
+                    <span className={`role-badge-glass ${roleClass}`}>{user.role}</span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
       <Footer />
     </>
   )
-}
-
-
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '2rem',
-    minHeight: 'calc(100vh - 200px)'
-  },
-  header: {
-    marginBottom: '2rem'
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#004499',
-    margin: '0'
-  },
-  subtitle: {
-    fontSize: '1rem',
-    color: '#666',
-    margin: '0.5rem 0 0 0'
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem'
-  },
-  statCard: {
-    backgroundColor: '#f8f9fa',
-    border: '1px solid #e0e0e0',
-    borderRadius: '8px',
-    padding: '1.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
-  },
-  statIcon: {
-    fontSize: '2.5rem',
-    minWidth: '50px'
-  },
-  statNumber: {
-    margin: '0',
-    fontSize: '1.8rem',
-    fontWeight: 'bold',
-    color: '#0066cc'
-  },
-  statLabel: {
-    margin: '0.25rem 0 0 0',
-    color: '#666',
-    fontSize: '0.9rem'
-  },
-  actionsSection: {
-    marginBottom: '2rem'
-  },
-  sectionTitle: {
-    fontSize: '1.4rem',
-    fontWeight: 'bold',
-    color: '#004499',
-    margin: '0 0 1rem 0'
-  },
-  buttonGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-    gap: '1rem'
-  },
-  actionBtn: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#0066cc',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '0.95rem',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 2px 8px rgba(0, 102, 204, 0.2)'
-  },
-  placeholderSection: {
-    backgroundColor: '#f0f4f8',
-    padding: '2rem',
-    borderRadius: '8px',
-    border: '1px solid #e0e0e0',
-    marginBottom: '2rem'
-  },
-  placeholder: {
-    color: '#999',
-    fontSize: '0.95rem',
-    margin: '0'
-  }
 }
 
 export default AdminDashboard

@@ -1,7 +1,50 @@
+import { useState } from 'react'
 import Header from '../common/Header'
 import Footer from '../common/Footer'
+import applicationsData from '../../data/applications.json'
 
 function UnderwriterDashboard() {
+  // State for filtering high risk applications
+  let [filterApps, setFilterApps] = useState(false)
+  
+  // Get all applications from JSON data
+  let allApplications = applicationsData.applications
+  
+  // Get pending applications
+  let pendingApplications = []
+  for (let i = 0; i < allApplications.length; i++) {
+    if (allApplications[i].status === 'pending') {
+      pendingApplications.push(allApplications[i])
+    }
+  }
+  
+  // Get high risk applications (risk score > 6)
+  let highRiskApps = []
+  for (let i = 0; i < pendingApplications.length; i++) {
+    if (pendingApplications[i].riskScore > 6) {
+      highRiskApps.push(pendingApplications[i])
+    }
+  }
+
+  // Toggle high risk filter
+  function handleReviewApplications() {
+    if (filterApps === true) {
+      setFilterApps(false)
+    } else {
+      setFilterApps(true)
+    }
+  }
+
+  // Get risk level class name based on score
+  function getRiskClass(riskScore) {
+    if (riskScore < 3) {
+      return 'low'
+    } else if (riskScore < 6) {
+      return 'medium'
+    } else {
+      return 'high'
+    }
+  }
   return (
     <>
       <Header />
@@ -11,29 +54,29 @@ function UnderwriterDashboard() {
           <p className="page-subtitle">Review and manage insurance applications</p>
 
           <div className="grid grid-4">
-            <div className="stat-card">
-              <div className="stat-icon">⏱️</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-blue">⧖</div>
               <div>
-                <h3 className="stat-number">12</h3>
+                <h3 className="stat-number">{pendingApplications.length}</h3>
                 <p className="stat-label">Pending Review</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">⚠️</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-red">⚑</div>
               <div>
                 <h3 className="stat-number">5</h3>
                 <p className="stat-label">High Risk Flagged</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">✅</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-green">✓</div>
               <div>
                 <h3 className="stat-number">28</h3>
                 <p className="stat-label">Approved Today</p>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">❌</div>
+            <div className="stat-card stat-card-glass">
+              <div className="stat-icon-amber">✕</div>
               <div>
                 <h3 className="stat-number">3</h3>
                 <p className="stat-label">Rejected</p>
@@ -43,17 +86,78 @@ function UnderwriterDashboard() {
 
           <div style={{marginBottom: '2rem'}}>
             <h2 className="section-title">Quick Actions</h2>
-            <div className="grid grid-2">
-              <button className="action-btn">Review Applications</button>
+            <div className="quick-actions">
+              <button className="action-btn" onClick={handleReviewApplications}>{filterApps ? 'Show All' : 'High Risk Only'}</button>
               <button className="action-btn">Risk Assessment</button>
               <button className="action-btn">View Documents</button>
               <button className="action-btn">Analytics</button>
             </div>
           </div>
 
+          {filterApps && (
+            <div className="warning-message">⚠ Filtering high-risk applications only ({highRiskApps.length})</div>
+          )}
+
           <div className="placeholder-section">
-            <h2 className="section-title">Application Queue</h2>
-            <p className="placeholder-text">Applications waiting for review will appear here</p>
+            {/* Decide which applications to show */}
+            {filterApps === true ? (
+              <h2 className="section-title">High Risk Applications ({highRiskApps.length})</h2>
+            ) : (
+              <h2 className="section-title">Pending Applications ({pendingApplications.length})</h2>
+            )}
+            
+            {/* Get applications to display */}
+            {filterApps === true ? (
+              highRiskApps.length > 0 ? (
+                <div style={{marginTop: '1rem'}}>
+                  {highRiskApps.map(function(app) {
+                    let riskClass = getRiskClass(app.riskScore)
+                    return (
+                      <div key={app.id} className="data-item">
+                        <div className="data-item-header">
+                          <h3 className="data-item-title">Application #{app.id}</h3>
+                          <div>
+                            <span className={`risk-badge-glass ${riskClass}`}>Risk: {app.riskScore}</span>
+                            <span style={{marginLeft: '0.5rem'}}></span>
+                            <button className="btn-glass primary">Review</button>
+                          </div>
+                        </div>
+                        <p className="data-item-text">Customer ID: {app.customerId}</p>
+                        <p className="data-item-text">Submitted: {app.submittedDate}</p>
+                        <p className="data-item-text">Notes: {app.reviewerNotes}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="placeholder-text">No high risk applications</p>
+              )
+            ) : (
+              pendingApplications.length > 0 ? (
+                <div style={{marginTop: '1rem'}}>
+                  {pendingApplications.map(function(app) {
+                    let riskClass = getRiskClass(app.riskScore)
+                    return (
+                      <div key={app.id} className="data-item">
+                        <div className="data-item-header">
+                          <h3 className="data-item-title">Application #{app.id}</h3>
+                          <div>
+                            <span className={`risk-badge-glass ${riskClass}`}>Risk: {app.riskScore}</span>
+                            <span style={{marginLeft: '0.5rem'}}></span>
+                            <button className="btn-glass primary">Review</button>
+                          </div>
+                        </div>
+                        <p className="data-item-text">Customer ID: {app.customerId}</p>
+                        <p className="data-item-text">Submitted: {app.submittedDate}</p>
+                        <p className="data-item-text">Notes: {app.reviewerNotes}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="placeholder-text">No pending applications</p>
+              )
+            )}
           </div>
         </div>
       </div>
