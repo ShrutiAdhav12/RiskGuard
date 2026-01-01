@@ -1,5 +1,5 @@
 import './styles/globals.css';
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -25,17 +25,23 @@ import AdminUsers from './components/admin-portal/UserManagement';
 import AdminReports from './components/admin-portal/AnalyticsCharts';
 import AdminSettings from './components/admin-portal/Settings';
 
+export const SidebarContext = React.createContext();
+
 function PortalLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 ml-20 md:ml-64">
-        <Navbar />
-        <main className="p-8 min-h-screen bg-gray-50">
-          {children}
-        </main>
+    <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+      <div className="flex h-screen">
+        <Sidebar onToggle={setSidebarOpen} isOpen={sidebarOpen} />
+        <div className={`flex-1 transition-all ${sidebarOpen ? 'ml-64 md:ml-64' : 'ml-20'}`}>
+          <Navbar />
+          <main className="p-8 min-h-screen bg-gray-50 overflow-auto">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 }
 

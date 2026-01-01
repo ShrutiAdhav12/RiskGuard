@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+export default function Sidebar({ onToggle, isOpen: externalIsOpen }) {
+  const [internalIsOpen, setInternalIsOpen] = useState(true);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const { role } = useAuth();
   const location = useLocation();
+
+  const handleToggle = () => {
+    const newState = !isOpen;
+    setInternalIsOpen(newState);
+    if (onToggle) onToggle(newState);
+  };
 
   const getMenuItems = () => {
     if (role === 'customer') {
@@ -37,9 +44,9 @@ export default function Sidebar() {
   const items = getMenuItems();
 
   return (
-    <aside className={`sidebar ${isOpen ? 'w-64' : 'w-20'} transition-all`}>
+    <aside className={`sidebar transition-all ${isOpen ? 'w-64' : 'w-20'}`}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="w-full p-4 text-white hover:bg-blue-600 text-lg font-bold"
       >
         {isOpen ? '←' : '→'}
