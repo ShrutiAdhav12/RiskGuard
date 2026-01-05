@@ -6,6 +6,13 @@
       "password": "123456",
       "id": "1767293994672",
       "createdAt": "2026-01-01"
+    },
+    {
+      "name": "Harshitha",
+      "email": "r@gmail.com",
+      "password": "123456",
+      "id": 1767326728330,
+      "createdAt": "2026-01-02"
     }
   ],
   "applications": [
@@ -29,6 +36,38 @@
       "premium": 1295,
       "createdAt": "2026-01-01T19:18:35.622Z",
       "updatedAt": "2026-01-01T19:36:45.646Z"
+    },
+    {
+      "name": "Harshitha",
+      "dob": "2003-10-28",
+      "contactInfo": "+91 8296738689",
+      "email": "r@gmail.com",
+      "productType": "health",
+      "coverage": "basic",
+      "insuranceType": "health",
+      "medicalHistory": "",
+      "preExistingConditions": "",
+      "currentMedications": "",
+      "documents": [
+        {
+          "name": "DOC-20250918-WA0031. (1).pdf",
+          "size": 8644883,
+          "type": "application/pdf"
+        }
+      ],
+      "customerId": 1767326728330,
+      "status": "pending",
+      "riskScore": 13,
+      "premium": 1200,
+      "appliedDate": "2026-01-02",
+      "createdAt": "2026-01-02T04:08:06.435Z",
+      "riskComponents": {
+        "ageRisk": 20,
+        "healthRisk": 5,
+        "lifestyleRisk": 10,
+        "claimHistoryRisk": 19
+      },
+      "id": "sAhgjjY"
     }
   ],
   "policies": [
@@ -56,7 +95,30 @@
       "createdAt": "2026-01-01T19:36:45.614Z"
     }
   ],
-  "riskAssessments": [],
+  "riskAssessments": [
+    {
+      "id": "RA-1767326886462",
+      "customerId": 1767326728330,
+      "applicationId": "sAhgjjY",
+      "riskScore": 13,
+      "riskComponents": {
+        "ageRisk": 20,
+        "healthRisk": 5,
+        "lifestyleRisk": 10,
+        "claimHistoryRisk": 19
+      },
+      "rulesApplied": [
+        "UNDER_MINIMUM_AGE"
+      ],
+      "exclusions": [],
+      "coverageLimits": {},
+      "result": "DECLINED",
+      "reason": "Applicant is under minimum age requirement (18)",
+      "assessmentDate": "2026-01-02",
+      "assessedBy": "AUTOMATED_SYSTEM",
+      "status": "COMPLETED"
+    }
+  ],
   "underwritingDecisions": [
     {
       "id": "UD-1767296205599",
