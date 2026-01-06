@@ -1,3 +1,5 @@
+//authcontext 
+
 import React, { createContext, useState, useEffect } from 'react';
 import { customerAPI, underwriterAPI, adminAPI } from '../utils/api';
 
@@ -82,6 +84,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('role');
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   const checkAuth = () => {
     const storedUser = localStorage.getItem('user');
     const storedRole = localStorage.getItem('role');
@@ -105,7 +112,8 @@ export function AuthProvider({ children }) {
       customerRegister,
       underwriterLogin,
       adminLogin,
-      logout
+      logout,
+      updateUser
     }}>
       {children}
     </AuthContext.Provider>
