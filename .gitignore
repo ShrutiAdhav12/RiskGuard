@@ -55,3 +55,6 @@ build/
 
 # Vite
 .vite/
+
+# Database files
+db.json
