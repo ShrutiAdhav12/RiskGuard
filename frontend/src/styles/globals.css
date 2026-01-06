@@ -238,7 +238,7 @@ tr:hover { background: #f9fafb; }
   box-shadow: 0 4px 12px rgba(89, 104, 255, 0.2);
 }
 
-.navbar a { color: white; }
+.navbar a { color: #362be4; }
 .navbar a:hover { color: #e0e7ff; }
 
 /* SIDEBAR */
