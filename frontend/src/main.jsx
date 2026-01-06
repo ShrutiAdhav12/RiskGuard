@@ -9,6 +9,7 @@ import Sidebar from './components/common/Sidebar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 import CustomerDashboard from './components/customer-portal/Dashboard';
@@ -53,6 +54,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
           <Route path="/customer/dashboard" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerDashboard /></PortalLayout></ProtectedRoute>} />

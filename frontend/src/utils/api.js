@@ -16,6 +16,21 @@ export const customerAPI = {
   login: (email, password) => api.get('/customers', {
     params: { email, password }
   }),
+  resetPassword: (email, newPassword) => {
+    // Find customer by email and update password
+    return api.get('/customers').then((response) => {
+      const customers = response.data;
+      const customer = customers.find(c => c.email === email);
+      if (customer) {
+        return api.put(`/customers/${customer.id}`, {
+          ...customer,
+          password: newPassword
+        });
+      } else {
+        return Promise.reject(new Error('Customer not found'));
+      }
+    });
+  }
 };
 
 // APPLICATION OPERATIONS

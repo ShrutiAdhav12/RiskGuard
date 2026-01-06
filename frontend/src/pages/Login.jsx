@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
-import { validateForm } from '../utils/validators';
 
 export default function Login() {
   const navigate = useNavigate();
   const { customerLogin, underwriterLogin, adminLogin } = useAuth();
-  const [role, setRole] = useState('customer'); // Hidden selection, direct input only
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
+
+  const onSubmit = async (data) => {
+    setServerError('');
     setLoading(true);
 
     try {
@@ -24,14 +31,14 @@ export default function Login() {
       let detectedRole = 'customer';
 
       // Auto-detect role based on email pattern
-      if (email.includes('underwriter')) {
-        success = await underwriterLogin(email, password);
+      if (data.email.includes('underwriter')) {
+        success = await underwriterLogin(data.email, data.password);
         detectedRole = 'underwriter';
-      } else if (email.includes('admin')) {
-        success = await adminLogin(email, password);
+      } else if (data.email.includes('admin')) {
+        success = await adminLogin(data.email, data.password);
         detectedRole = 'admin';
       } else {
-        success = await customerLogin(email, password);
+        success = await customerLogin(data.email, data.password);
         detectedRole = 'customer';
       }
 
@@ -40,10 +47,10 @@ export default function Login() {
         else if (detectedRole === 'admin') navigate('/admin/dashboard');
         else navigate('/customer/dashboard');
       } else {
-        setError('Invalid email or password');
+        setServerError('Invalid email or password');
       }
     } catch (err) {
-      setError('Login failed');
+      setServerError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -58,18 +65,26 @@ export default function Login() {
             <h1 className="text-3xl font-bold text-center mb-2">Login</h1>
             <p className="text-center text-gray-600 text-sm mb-8">Welcome to RiskGuard</p>
 
-            {error && <div className="alert alert-error mb-4">{error}</div>}
+            {serverError && <div className="alert alert-error mb-4">{serverError}</div>}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="form-group">
                 <label>Email Address</label>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  required
+                  className={`w-full px-4 py-2 border rounded-lg ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Please enter a valid email address'
+                    }
+                  })}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Customer, underwriter, or admin email
                 </p>
@@ -79,11 +94,25 @@ export default function Login() {
                 <label>Password</label>
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  required
+                  className={`w-full px-4 py-2 border rounded-lg ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: {
+                      value: 6,
+                      message: 'Password must be at least 6 characters'
+                    }
+                  })}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="text-right">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
 
               <button
@@ -97,7 +126,7 @@ export default function Login() {
 
             <div className="mt-6 pt-6 border-t text-center">
               <p className="text-sm text-gray-600 mb-4">New to RiskGuard?</p>
-              <Link to="/register" className="btn-secondary btn-block">Create Customer Account</Link>
+              <Link to="/register" className="btn-secondary btn-block">Create Account</Link>
             </div>
           </div>
         </div>
