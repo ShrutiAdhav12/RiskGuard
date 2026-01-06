@@ -11,9 +11,16 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleLogoClick = () => {
+    if (user) {
+      logout();
+    }
+    navigate('/');
+  };
+
   return (
     <nav className="navbar flex items-center justify-between px-6 py-4">
-      <Link to="/" className="text-2xl font-bold text-white">RiskGuard</Link>
+      <button onClick={handleLogoClick} className="text-2xl font-bold text-white bg-none border-none cursor-pointer hover:opacity-80">RiskGuard</button>
       <div className="flex items-center gap-4">
         {user ? (
           <>

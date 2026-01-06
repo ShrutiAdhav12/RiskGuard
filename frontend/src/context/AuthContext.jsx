@@ -8,8 +8,22 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const savedRole = localStorage.getItem('role');
+    if (savedUser && savedRole) {
+      try {
+        setUser(JSON.parse(savedUser));
+        setRole(savedRole);
+      } catch (err) {
+        console.error('Failed to restore user:', err);
+      }
+    }
+    setLoading(false);
+  }, []);
 
   const customerLogin = async (email, password) => {
     try {
