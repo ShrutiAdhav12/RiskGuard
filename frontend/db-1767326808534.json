@@ -6,6 +6,20 @@
       "password": "123456",
       "id": "1767293994672",
       "createdAt": "2026-01-01"
+    },
+    {
+      "name": "Poojithatt",
+      "email": "p@gmail.com",
+      "phone": "7396359558",
+      "dob": "2004-06-26",
+      "id": 1767326176421
+    },
+    {
+      "name": "Rajat",
+      "email": "rajat@mail.com",
+      "password": "123456",
+      "id": 1767326437073,
+      "createdAt": "2026-01-02"
     }
   ],
   "applications": [
@@ -67,26 +81,6 @@
       "decisionReason": "Application approved by underwriter",
       "reviewRequired": false,
       "createdAt": "2026-01-01T19:36:45.599Z"
-    },
-    {
-      "id": "UD-1767346381488",
-      "customerId": 1767326176421,
-      "assessmentId": "RA-Db55iU1",
-      "status": "APPROVED",
-      "decisionDate": "2026-01-02",
-      "decisionReason": "Application approved by underwriter",
-      "reviewRequired": false,
-      "createdAt": "2026-01-02T09:33:01.488Z"
-    },
-    {
-      "id": "UD-1767595143698",
-      "customerId": 1767326176421,
-      "assessmentId": "RA-Af2lczr",
-      "status": "APPROVED",
-      "decisionDate": "2026-01-05",
-      "decisionReason": "Application approved by underwriter",
-      "reviewRequired": false,
-      "createdAt": "2026-01-05T06:39:03.698Z"
     }
   ],
   "premiumPayments": [
@@ -106,40 +100,6 @@
       "reminders": 0,
       "createdAt": "2026-01-01T19:36:45.628Z",
       "updatedAt": "2026-01-01T19:36:45.628Z"
-    },
-    {
-      "id": "PAY-1767346381556",
-      "policyId": "POL-1767346381528",
-      "customerId": 1767326176421,
-      "amount": 1200,
-      "basePremium": 1500,
-      "taxAmount": 216,
-      "finalAmount": 1416,
-      "status": "UNPAID",
-      "dueDate": "2026-01-02",
-      "paymentDate": null,
-      "paymentMethod": null,
-      "transactionId": null,
-      "reminders": 0,
-      "createdAt": "2026-01-02T09:33:01.556Z",
-      "updatedAt": "2026-01-02T09:33:01.556Z"
-    },
-    {
-      "id": "PAY-1767595143766",
-      "policyId": "POL-1767595143741",
-      "customerId": 1767326176421,
-      "amount": 1200,
-      "basePremium": 1500,
-      "taxAmount": 216,
-      "finalAmount": 1416,
-      "status": "UNPAID",
-      "dueDate": "2026-01-05",
-      "paymentDate": null,
-      "paymentMethod": null,
-      "transactionId": null,
-      "reminders": 0,
-      "createdAt": "2026-01-05T06:39:03.766Z",
-      "updatedAt": "2026-01-05T06:39:03.766Z"
     }
   ],
   "riskReports": [],

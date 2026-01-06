@@ -1,26 +1,136 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { customerAPI } from '../../utils/api';
 
 export default function CustomerSettings() {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('account');
+  const [activeTab, setActiveTab] = useState('notifications');
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
     notificationsEmail: true,
     notificationsSMS: false,
     marketingEmails: false
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
   const [saved, setSaved] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   const handleChange = (e) => {
-    const { name, type, checked, value } = e.target;
+    const { name, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : e.target.value
     }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error for this field
+    setPasswordErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }));
+  };
+
+  const validatePasswordForm = () => {
+    const errors = {};
+
+    if (!passwordData.currentPassword) {
+      errors.currentPassword = 'Current password is required';
+    }
+
+    if (!passwordData.newPassword) {
+      errors.newPassword = 'New password is required';
+    } else if (passwordData.newPassword.length < 6) {
+      errors.newPassword = 'New password must be at least 6 characters';
+    }
+
+    if (!passwordData.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your new password';
+    }
+
+    // Check if new password and confirm password match
+    if (passwordData.newPassword && passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword) {
+      errors.confirmPassword = 'New password and confirm password must match';
+    }
+
+    // Check if new password is different from current password
+    if (passwordData.currentPassword && passwordData.newPassword && passwordData.currentPassword === passwordData.newPassword) {
+      errors.newPassword = 'New password must be different from current password';
+    }
+
+    return errors;
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    
+    const errors = validatePasswordForm();
+    if (Object.keys(errors).length > 0) {
+      setPasswordErrors(errors);
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      // Verify current password by attempting to login
+      const loginResponse = await customerAPI.login(user.email, passwordData.currentPassword);
+      
+      if (!loginResponse.data || loginResponse.data.length === 0) {
+        setPasswordErrors({ currentPassword: 'Current password is incorrect' });
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Verify new password and confirm password match (double check)
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        setPasswordErrors({ confirmPassword: 'New password and confirm password must match' });
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Verify new password is different from current password
+      if (passwordData.currentPassword === passwordData.newPassword) {
+        setPasswordErrors({ newPassword: 'New password must be different from current password' });
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Update password in the customer record
+      await customerAPI.update(user.id, {
+        password: passwordData.newPassword
+      });
+
+      setPasswordSuccess(true);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setPasswordErrors({});
+
+      setTimeout(() => {
+        setPasswordSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Password update error:', err);
+      if (err.response?.status === 404) {
+        setPasswordErrors({ currentPassword: 'Current password is incorrect' });
+      } else {
+        setPasswordErrors({ currentPassword: 'Error updating password. Please try again.' });
+      }
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   const handleSave = () => {
@@ -35,82 +145,25 @@ export default function CustomerSettings() {
       {/* Tab Navigation */}
       <div className="flex gap-4 border-b">
         <button
-          onClick={() => setActiveTab('account')}
-          className={`pb-3 px-2 ${activeTab === 'account' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
-        >
-          Account
-        </button>
-        <button
           onClick={() => setActiveTab('notifications')}
           className={`pb-3 px-2 ${activeTab === 'notifications' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
         >
           Notifications
         </button>
         <button
-          onClick={() => setActiveTab('privacy')}
-          className={`pb-3 px-2 ${activeTab === 'privacy' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
+          onClick={() => setActiveTab('password')}
+          className={`pb-3 px-2 ${activeTab === 'password' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
         >
-          Privacy & Security
+          Password Change
         </button>
       </div>
 
       {saved && <div className="alert alert-success">Settings saved successfully!</div>}
 
-      {/* Account Settings */}
-      {activeTab === 'account' && (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="text-xl font-bold">Account Information</h2>
-          </div>
-          <div className="card-body space-y-4">
-            <div className="form-group">
-              <label>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full"
-              />
-            </div>
-            <div className="form-group">
-              <label>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full"
-                disabled
-              />
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-            </div>
-            <div className="form-group">
-              <label>Phone Number</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+1 (555) 000-0000"
-                className="w-full"
-              />
-            </div>
-            <div className="form-group">
-              <label>Address</label>
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Your address"
-                rows="3"
-                className="w-full"
-              />
-            </div>
-            <button onClick={handleSave} className="btn-primary">
-              Save Changes
-            </button>
-          </div>
+      {passwordSuccess && (
+        <div className="alert alert-success">
+          <p className="font-semibold">Password updated successfully!</p>
+          <p className="text-sm mt-1">Please logout and login again with your new password.</p>
         </div>
       )}
 
@@ -167,39 +220,64 @@ export default function CustomerSettings() {
         </div>
       )}
 
-      {/* Privacy & Security */}
-      {activeTab === 'privacy' && (
+      {/* Password Change */}
+      {activeTab === 'password' && (
         <div className="space-y-4">
           <div className="card">
             <div className="card-header">
-              <h2 className="text-xl font-bold">Password</h2>
+              <h2 className="text-xl font-bold">Change Password</h2>
             </div>
-            <div className="card-body space-y-4">
+            <form onSubmit={handlePasswordUpdate} className="card-body space-y-4">
               <div className="form-group">
                 <label>Current Password</label>
-                <input type="password" placeholder="Enter current password" className="w-full" />
+                <input 
+                  type="password" 
+                  name="currentPassword"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter current password" 
+                  className={`w-full ${passwordErrors.currentPassword ? 'border-red-500' : ''}`}
+                />
+                {passwordErrors.currentPassword && (
+                  <p className="text-red-500 text-sm mt-1">{passwordErrors.currentPassword}</p>
+                )}
               </div>
               <div className="form-group">
                 <label>New Password</label>
-                <input type="password" placeholder="Enter new password" className="w-full" />
+                <input 
+                  type="password" 
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter new password (min 6 characters)" 
+                  className={`w-full ${passwordErrors.newPassword ? 'border-red-500' : ''}`}
+                />
+                {passwordErrors.newPassword && (
+                  <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                )}
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input type="password" placeholder="Confirm new password" className="w-full" />
+                <input 
+                  type="password" 
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm new password" 
+                  className={`w-full ${passwordErrors.confirmPassword ? 'border-red-500' : ''}`}
+                />
+                {passwordErrors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+                )}
               </div>
-              <button className="btn-primary">Update Password</button>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-xl font-bold">Data & Privacy</h2>
-            </div>
-            <div className="card-body space-y-3">
-              <p className="text-sm text-gray-700">Your data is protected under our privacy policy. You can:</p>
-              <button className="btn-secondary w-full">Download Your Data</button>
-              <button className="btn-secondary w-full">Delete Account</button>
-            </div>
+              <button 
+                type="submit"
+                disabled={passwordLoading}
+                className="btn-primary"
+              >
+                {passwordLoading ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
           </div>
 
           <div className="card bg-red-50 border border-red-200">
