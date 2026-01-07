@@ -58,15 +58,21 @@ export default function PaymentTracker() {
 
   const handleMarkAsPaid = async (paymentId) => {
     try {
-      await premiumPaymentAPI.recordPayment(paymentId, {
+      const payment = payments.find(p => p.id === paymentId);
+      const updatedPayment = {
+        ...payment,
+        status: 'PAID',
         paymentMethod: 'ONLINE',
-        transactionId: `TXN-${Date.now()}`
-      });
+        transactionId: `TXN-${Date.now()}`,
+        paymentDate: new Date().toISOString()
+      };
+      
+      await premiumPaymentAPI.update(paymentId, updatedPayment);
       
       setPayments(prev => prev.map(p => 
-        p.id === paymentId ? { ...p, status: 'PAID', paymentDate: new Date().toISOString().split('T')[0] } : p
+        p.id === paymentId ? updatedPayment : p
       ));
-      alert('Payment marked as paid!');
+      alert('✓ Payment confirmed! Status saved to database.');
     } catch (err) {
       console.error('Error updating payment:', err);
       alert('Error updating payment status');

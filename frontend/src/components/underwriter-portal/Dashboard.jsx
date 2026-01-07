@@ -127,10 +127,10 @@ export default function UnderwriterDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
+                  <tr>
                     <th className="text-left py-2">Date</th>
+                    <th className="text-left py-2">Customer Name</th>
                     <th className="text-left py-2">Product</th>
-                    <th className="text-left py-2 hidden sm:table-cell">Customer ID</th>
                     <th className="text-left py-2">Risk Score</th>
                     <th className="text-left py-2">Action</th>
                   </tr>

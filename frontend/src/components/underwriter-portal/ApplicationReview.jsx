@@ -9,6 +9,7 @@ export default function ApplicationReview() {
   const [filter, setFilter] = useState('all');
   const [reviewingId, setReviewingId] = useState(null);
   const [savingId, setSavingId] = useState(null);
+  const [premiumAdjustments, setPremiumAdjustments] = useState({});
 
   useEffect(() => {
     const loadApplications = async () => {
@@ -31,6 +32,13 @@ export default function ApplicationReview() {
     return app.status === filter;
   });
 
+  const calculateSuggestedPremium = (riskScore) => {
+    const basePremium = 1500;
+    if (riskScore > 70) return Math.round(basePremium * 1.5); // +50% for high risk
+    if (riskScore > 40) return basePremium; // Standard
+    return Math.round(basePremium * 0.9); // -10% discount for low risk
+  };
+
   const handleApprove = async (app) => {
     setSavingId(app.id);
     try {
@@ -45,12 +53,15 @@ export default function ApplicationReview() {
 
       await underwritingDecisionAPI.create(decision);
 
-      // Generate policy
+      // Get the final premium from adjustments or use default
+      const finalPremium = premiumAdjustments[app.id] || app.premium || 1500;
+
+      // Generate policy with the confirmed premium
       const premiumBreakdown = {
         basePremium: 1500,
         riskFactor: app.riskScore > 70 ? 1.5 : app.riskScore > 40 ? 1.0 : 0.8,
         coverageMultiplier: 1.0,
-        finalPremium: app.premium || 1500
+        finalPremium: finalPremium
       };
 
       const policy = generatePolicy(app, {
@@ -61,7 +72,7 @@ export default function ApplicationReview() {
 
       await policyAPI.create(policy);
 
-      // Create premium payment record
+      // Create premium payment record with the confirmed premium
       const payment = createPremiumPayment(policy);
       await premiumPaymentAPI.create(payment);
 
@@ -69,7 +80,12 @@ export default function ApplicationReview() {
       await applicationAPI.updateStatus(app.id, 'approved');
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
       setReviewingId(null);
-      alert('Application approved! Policy generated and premium payment created.');
+      setPremiumAdjustments(prev => {
+        const updated = { ...prev };
+        delete updated[app.id];
+        return updated;
+      });
+      alert('✓ Application approved! Policy generated with confirmed premium.');
     } catch (err) {
       console.error('Error approving application:', err);
       alert('Error approving application');
@@ -140,8 +156,8 @@ export default function ApplicationReview() {
                 <div className="card-body">
                   <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Application ID</p>
-                      <p className="font-semibold text-sm">{app.id}</p>
+                      <p className="text-gray-600 text-sm">Customer Name</p>
+                      <p className="font-semibold text-sm">{app.name || 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 text-sm">Product</p>
@@ -300,22 +316,86 @@ export default function ApplicationReview() {
                   )}
 
                   {reviewingId === app.id && app.status === 'pending' && (
+                    <>
+                    {/* Premium Adjustment Section */}
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-5 rounded-lg mb-4 border-2 border-green-300">
+                      <h4 className="font-bold text-lg mb-4 text-green-900">Premium Configuration</h4>
+                      
+                      {/* Suggested Premium */}
+                      <div className="bg-white p-4 rounded-lg mb-4 border border-green-200">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <p className="text-xs text-gray-600 font-semibold mb-1">BASE PREMIUM</p>
+                            <p className="text-2xl font-bold text-blue-600">₹1,500</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-600 font-semibold mb-1">RISK ADJUSTMENT</p>
+                            <p className={`text-2xl font-bold ${
+                              app.riskScore > 70 ? 'text-red-600' : 
+                              app.riskScore > 40 ? 'text-gray-600' : 
+                              'text-green-600'
+                            }`}>
+                              {app.riskScore > 70 ? '+50%' : app.riskScore > 40 ? '+0%' : '-10%'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-600 font-semibold mb-1">SUGGESTED PREMIUM</p>
+                            <p className="text-2xl font-bold text-emerald-600">₹{calculateSuggestedPremium(app.riskScore)}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Final Premium Input */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Final Premium Amount (Editable)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            min="500"
+                            max="10000"
+                            value={premiumAdjustments[app.id] || calculateSuggestedPremium(app.riskScore)}
+                            onChange={(e) => setPremiumAdjustments(prev => ({
+                              ...prev,
+                              [app.id]: parseInt(e.target.value) || 0
+                            }))}
+                            className="flex-1 px-4 py-2 border-2 border-green-300 rounded-lg focus:outline-none focus:border-green-500"
+                            placeholder="Enter premium amount"
+                          />
+                          <button
+                            onClick={() => setPremiumAdjustments(prev => ({
+                              ...prev,
+                              [app.id]: calculateSuggestedPremium(app.riskScore)
+                            }))}
+                            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200"
+                          >
+                            Use Suggested
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">
+                          💡 You can adjust this premium based on additional factors or underwriting discretion
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Decision Buttons */}
                     <div className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
                       <p className="font-semibold mb-3">Make Underwriting Decision:</p>
                       <div className="flex gap-2 flex-wrap">
                         <button
                           onClick={() => handleApprove(app)}
-                          disabled={savingId === app.id}
+                          disabled={savingId === app.id || !premiumAdjustments[app.id]}
                           className="btn-success disabled:opacity-50"
                         >
-                          {savingId === app.id ? 'Approving...' : 'Approve & Generate Policy'}
+                          {savingId === app.id ? 'Processing...' : `Approve & Generate Policy (₹${premiumAdjustments[app.id] || calculateSuggestedPremium(app.riskScore)})`}
                         </button>
                         <button
                           onClick={() => handleReject(app)}
                           disabled={savingId === app.id}
                           className="btn-danger disabled:opacity-50"
                         >
-                          {savingId === app.id ? 'Rejecting...' : 'Reject'}
+                          {savingId === app.id ? 'Rejecting...' : 'Reject Application'}
                         </button>
                         <button
                           onClick={() => setReviewingId(null)}
@@ -326,6 +406,7 @@ export default function ApplicationReview() {
                         </button>
                       </div>
                     </div>
+                    </>
                   )}
 
                   <div className="flex gap-2">

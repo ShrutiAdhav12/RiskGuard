@@ -105,10 +105,12 @@ export default function CustomerSettings() {
         return;
       }
 
-      // Update password in the customer record
-      await customerAPI.update(user.id, {
-        password: passwordData.newPassword
-      });
+      // Update password in the customer record while preserving all other fields
+      const updatedUser = { ...user, password: passwordData.newPassword };
+      await customerAPI.update(user.id, updatedUser);
+      
+      // Update user in context and localStorage
+      updateUser(updatedUser);
 
       setPasswordSuccess(true);
       setPasswordData({
@@ -118,9 +120,11 @@ export default function CustomerSettings() {
       });
       setPasswordErrors({});
 
+      // Auto-logout after 2 seconds so user must re-login with new password
       setTimeout(() => {
         setPasswordSuccess(false);
-      }, 3000);
+        logout();
+      }, 2000);
     } catch (err) {
       console.error('Password update error:', err);
       if (err.response?.status === 404) {

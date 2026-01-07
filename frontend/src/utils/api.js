@@ -88,7 +88,7 @@ export const premiumPaymentAPI = {
   }),
   create: (data) => api.post('/premiumPayments', data),
   update: (id, data) => api.put(`/premiumPayments/${id}`, data),
-  recordPayment: (id, paymentData) => api.patch(`/premiumPayments/${id}`, {
+  recordPayment: (id, paymentData) => api.put(`/premiumPayments/${id}`, {
     status: 'PAID',
     paymentDate: new Date().toISOString(),
     ...paymentData
