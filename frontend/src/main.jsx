@@ -18,6 +18,7 @@ import CustomerProfile from './components/customer-portal/ProfileSection';
 import CustomerSettings from './components/customer-portal/Settings';
 import UnderwriterDashboard from './components/underwriter-portal/Dashboard';
 import UnderwriterPending from './components/underwriter-portal/ApplicationReview';
+import UnderwriterNotifications from './components/underwriter-portal/Notifications';
 import UnderwriterSettings from './components/underwriter-portal/Settings';
 import AdminDashboard from './components/admin-portal/Dashboard';
 import AdminProducts from './components/admin-portal/ProductManagement';
@@ -63,6 +64,7 @@ function App() {
 
           <Route path="/underwriter/dashboard" element={<ProtectedRoute requiredRole="underwriter"><PortalLayout><UnderwriterDashboard /></PortalLayout></ProtectedRoute>} />
           <Route path="/underwriter/pending" element={<ProtectedRoute requiredRole="underwriter"><PortalLayout><UnderwriterPending /></PortalLayout></ProtectedRoute>} />
+          <Route path="/underwriter/notifications" element={<ProtectedRoute requiredRole="underwriter"><PortalLayout><UnderwriterNotifications /></PortalLayout></ProtectedRoute>} />
           <Route path="/underwriter/settings" element={<ProtectedRoute requiredRole="underwriter"><PortalLayout><UnderwriterSettings /></PortalLayout></ProtectedRoute>} />
 
           <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><PortalLayout><AdminDashboard /></PortalLayout></ProtectedRoute>} />

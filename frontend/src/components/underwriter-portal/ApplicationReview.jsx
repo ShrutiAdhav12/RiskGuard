@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { applicationAPI, policyAPI, premiumPaymentAPI, underwritingDecisionAPI } from '../../utils/api';
+import { applicationAPI, policyAPI, premiumPaymentAPI, underwritingDecisionAPI, underwriterPreferencesAPI, underwriterRulesAPI } from '../../utils/api';
 import { formatDate, getStatusBadge } from '../../utils/helpers';
 import { applyUnderwritingRules, calculateAge, generatePolicy, createPremiumPayment, generateRiskReport, createUnderwritingDecision } from '../../utils/riskEngine';
 
@@ -10,20 +10,37 @@ export default function ApplicationReview() {
   const [reviewingId, setReviewingId] = useState(null);
   const [savingId, setSavingId] = useState(null);
   const [premiumAdjustments, setPremiumAdjustments] = useState({});
+  const [preferences, setPreferences] = useState({
+    autoApproveThreshold: 30
+  });
+  const [rules, setRules] = useState([]);
 
   useEffect(() => {
-    const loadApplications = async () => {
+    const loadData = async () => {
       try {
+        // Load preferences
+        const prefRes = await underwriterPreferencesAPI.getAll();
+        if (prefRes.data && prefRes.data.length > 0) {
+          setPreferences(prefRes.data[0]);
+        }
+
+        // Load rules
+        const rulesRes = await underwriterRulesAPI.getAll();
+        if (rulesRes.data && rulesRes.data.length > 0 && rulesRes.data[0].rules) {
+          setRules(rulesRes.data[0].rules);
+        }
+
+        // Load applications
         const response = await applicationAPI.getAll();
         const data = response.data || [];
         setApplications(data);
       } catch (err) {
-        console.error('Failed to load applications:', err);
+        console.error('Failed to load data:', err);
       } finally {
         setLoading(false);
       }
     };
-    loadApplications();
+    loadData();
   }, []);
 
   const filtered = applications.filter(app => {
@@ -32,12 +49,37 @@ export default function ApplicationReview() {
     return app.status === filter;
   });
 
+  const getApplicableRule = (riskScore) => {
+    if (rules.length === 0) return null;
+    return rules.find(rule => riskScore >= rule.scoreMin && riskScore <= rule.scoreMax);
+  };
+
   const calculateSuggestedPremium = (riskScore) => {
     const basePremium = 1500;
-    if (riskScore > 70) return Math.round(basePremium * 1.5); // +50% for high risk
-    if (riskScore > 40) return basePremium; // Standard
-    return Math.round(basePremium * 0.9); // -10% discount for low risk
+    const rule = getApplicableRule(riskScore);
+    
+    if (!rule) {
+      // Fallback to original logic if no rule matches
+      if (riskScore > 70) return Math.round(basePremium * 1.5);
+      if (riskScore > 40) return basePremium;
+      return Math.round(basePremium * 0.9);
+    }
+
+    // Extract percentage from premium adjustment string (e.g., "-20%" -> -0.2)
+    const premiumStr = rule.premium;
+    const match = premiumStr.match(/([+-]?\d+(?:\.\d+)?)/);
+    if (match && premiumStr.includes('%')) {
+      const percentage = parseInt(match[1]) / 100;
+      return Math.round(basePremium * (1 + percentage));
+    }
+    return basePremium;
   };
+
+  const isAutoApprovable = (app) => {
+    const rule = getApplicableRule(app.riskScore);
+    return rule && rule.decision === 'APPROVED' && app.riskScore <= preferences.autoApproveThreshold;
+  };
+
 
   const handleApprove = async (app) => {
     setSavingId(app.id);
@@ -192,6 +234,15 @@ export default function ApplicationReview() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Auto-Approve Indicator */}
+                  {app.riskScore <= preferences.autoApproveThreshold && app.status === 'pending' && (
+                    <div className="bg-green-50 border-l-4 border-green-500 p-3 mb-4 rounded">
+                      <p className="text-green-800 text-sm font-semibold">
+                        ✅ Eligible for Auto-Approval (Risk Score {app.riskScore} ≤ {preferences.autoApproveThreshold})
+                      </p>
+                    </div>
+                  )}
 
                   {/* Enhanced Risk Analysis - Only show when reviewing */}
                   {reviewingId === app.id && (

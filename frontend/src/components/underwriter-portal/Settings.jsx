@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { underwriterPreferencesAPI, underwriterRulesAPI } from '../../utils/api';
 
 export default function UnderwriterSettings() {
   const [activeTab, setActiveTab] = useState('preferences');
@@ -10,7 +11,49 @@ export default function UnderwriterSettings() {
     caseAssignmentMethod: 'round-robin',
     dailyReportEmail: true
   });
+  const [rules, setRules] = useState([]);
+  const [editingRuleId, setEditingRuleId] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [preferencesId, setPreferencesId] = useState(null);
+  const [rulesId, setRulesId] = useState(null);
+
+  // Load preferences and rules from database on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load preferences
+        const prefsResponse = await underwriterPreferencesAPI.getAll();
+        const prefsData = prefsResponse.data || [];
+        if (prefsData.length > 0) {
+          const prefs = prefsData[0];
+          setPreferencesId(prefs.id);
+          setSettings({
+            autoApproveThreshold: prefs.autoApproveThreshold,
+            riskAssessmentLevel: prefs.riskAssessmentLevel,
+            emailNotifications: prefs.emailNotifications,
+            decisionTemplates: prefs.decisionTemplates,
+            caseAssignmentMethod: prefs.caseAssignmentMethod,
+            dailyReportEmail: prefs.dailyReportEmail
+          });
+        }
+
+        // Load rules
+        const rulesResponse = await underwriterRulesAPI.getAll();
+        const rulesData = rulesResponse.data || [];
+        if (rulesData.length > 0) {
+          const rulesRecord = rulesData[0];
+          setRulesId(rulesRecord.id);
+          setRules(rulesRecord.rules || []);
+        }
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
@@ -20,9 +63,69 @@ export default function UnderwriterSettings() {
     }));
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleRuleChange = (ruleId, field, value) => {
+    setRules(prev => prev.map(rule =>
+      rule.id === ruleId ? { ...rule, [field]: value } : rule
+    ));
+  };
+
+  const handleSave = async () => {
+    try {
+      const dataToSave = {
+        ...settings,
+        underwriterId: "1",
+        updatedAt: new Date().toISOString().split('T')[0]
+      };
+
+      if (preferencesId) {
+        // Update existing preferences
+        await underwriterPreferencesAPI.update(preferencesId, dataToSave);
+      } else {
+        // Create new preferences
+        const newData = {
+          ...dataToSave,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        const response = await underwriterPreferencesAPI.create(newData);
+        setPreferencesId(response.data.id);
+      }
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error('Error saving preferences:', err);
+      alert('Error saving preferences');
+    }
+  };
+
+  const handleSaveRules = async () => {
+    try {
+      const dataToSave = {
+        underwriterId: "1",
+        rules: rules,
+        updatedAt: new Date().toISOString().split('T')[0]
+      };
+
+      if (rulesId) {
+        // Update existing rules
+        await underwriterRulesAPI.update(rulesId, dataToSave);
+      } else {
+        // Create new rules
+        const newData = {
+          ...dataToSave,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        const response = await underwriterRulesAPI.create(newData);
+        setRulesId(response.data.id);
+      }
+      
+      setEditingRuleId(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error('Error saving rules:', err);
+      alert('Error saving rules');
+    }
   };
 
   return (
@@ -42,12 +145,6 @@ export default function UnderwriterSettings() {
           className={`pb-3 px-2 whitespace-nowrap ${activeTab === 'rules' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
         >
           Decision Rules
-        </button>
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`pb-3 px-2 whitespace-nowrap ${activeTab === 'notifications' ? 'border-b-2 border-primary text-primary font-bold' : 'text-gray-600'}`}
-        >
-          Notifications
         </button>
       </div>
 
@@ -128,102 +225,110 @@ export default function UnderwriterSettings() {
       {/* Decision Rules Tab */}
       {activeTab === 'rules' && (
         <div className="space-y-4">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-xl font-bold">Current Decision Rules</h2>
-            </div>
-            <div className="card-body">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2">Risk Level</th>
-                      <th className="text-left py-2">Score Range</th>
-                      <th className="text-left py-2">Decision</th>
-                      <th className="text-left py-2">Premium</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b hover:bg-gray-50">
-                      <td className="py-3"><span className="badge badge-success">Very Low</span></td>
-                      <td>0-30</td>
-                      <td>APPROVED</td>
-                      <td>-20% discount</td>
-                    </tr>
-                    <tr className="border-b hover:bg-gray-50">
-                      <td className="py-3"><span className="badge badge-info">Low</span></td>
-                      <td>31-50</td>
-                      <td>APPROVED</td>
-                      <td>-10% discount</td>
-                    </tr>
-                    <tr className="border-b hover:bg-gray-50">
-                      <td className="py-3"><span className="badge badge-warning">Medium</span></td>
-                      <td>51-70</td>
-                      <td>REVIEW REQUIRED</td>
-                      <td>0% (Standard)</td>
-                    </tr>
-                    <tr className="border-b hover:bg-gray-50">
-                      <td className="py-3"><span className="badge badge-orange">High</span></td>
-                      <td>71-85</td>
-                      <td>REVIEW REQUIRED</td>
-                      <td>+20% surcharge</td>
-                    </tr>
-                    <tr className="border-b hover:bg-gray-50">
-                      <td className="py-3"><span className="badge badge-danger">Very High</span></td>
-                      <td>85+</td>
-                      <td>DECLINED</td>
-                      <td>Not Insurable</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="text-xs text-gray-500 mt-4">Rules are managed by administration. Contact admin to modify.</p>
-            </div>
-          </div>
+          {loading ? (
+            <p>Loading rules...</p>
+          ) : (
+            <>
+              {rules.length === 0 ? (
+                <p className="text-gray-500">No rules loaded</p>
+              ) : (
+                rules.map((rule) => (
+                  <div key={rule.id} className="card">
+                    <div className="card-header">
+                      <h3 className="text-lg font-bold">{rule.label}</h3>
+                    </div>
+                    <div className="card-body space-y-4">
+                      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                        <div className="form-group">
+                          <label>Min Score</label>
+                          <input
+                            type="number"
+                            value={rule.scoreMin}
+                            onChange={(e) => handleRuleChange(rule.id, 'scoreMin', parseInt(e.target.value))}
+                            disabled={editingRuleId !== rule.id}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Max Score</label>
+                          <input
+                            type="number"
+                            value={rule.scoreMax}
+                            onChange={(e) => handleRuleChange(rule.id, 'scoreMax', parseInt(e.target.value))}
+                            disabled={editingRuleId !== rule.id}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Decision</label>
+                          <select
+                            value={rule.decision}
+                            onChange={(e) => handleRuleChange(rule.id, 'decision', e.target.value)}
+                            disabled={editingRuleId !== rule.id}
+                            className="w-full"
+                          >
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="REVIEW_REQUIRED">REVIEW REQUIRED</option>
+                            <option value="DECLINED">DECLINED</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>Premium Adjustment</label>
+                          <input
+                            type="text"
+                            value={rule.premium}
+                            onChange={(e) => handleRuleChange(rule.id, 'premium', e.target.value)}
+                            disabled={editingRuleId !== rule.id}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Rules Description</label>
+                        <textarea
+                          value={rule.rules ? rule.rules.join('\n') : ''}
+                          onChange={(e) => handleRuleChange(rule.id, 'rules', e.target.value.split('\n'))}
+                          disabled={editingRuleId !== rule.id}
+                          rows="3"
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        {editingRuleId === rule.id ? (
+                          <>
+                            <button
+                              onClick={handleSaveRules}
+                              className="btn-primary"
+                            >
+                              Save Rule
+                            </button>
+                            <button
+                              onClick={() => setEditingRuleId(null)}
+                              className="btn-secondary"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setEditingRuleId(rule.id)}
+                            className="btn-secondary"
+                          >
+                            Edit Rule
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </>
+          )}
         </div>
       )}
 
-      {/* Notifications Tab */}
-      {activeTab === 'notifications' && (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="text-xl font-bold">Notification Settings</h2>
-          </div>
-          <div className="card-body space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <div>
-                <p className="font-semibold">Email Notifications</p>
-                <p className="text-sm text-gray-600">Receive alerts for new applications</p>
-              </div>
-              <input
-                type="checkbox"
-                name="emailNotifications"
-                checked={settings.emailNotifications}
-                onChange={handleChange}
-                className="w-5 h-5 cursor-pointer"
-              />
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <div>
-                <p className="font-semibold">Daily Report Email</p>
-                <p className="text-sm text-gray-600">Get daily summary of your decisions</p>
-              </div>
-              <input
-                type="checkbox"
-                name="dailyReportEmail"
-                checked={settings.dailyReportEmail}
-                onChange={handleChange}
-                className="w-5 h-5 cursor-pointer"
-              />
-            </div>
-
-            <button onClick={handleSave} className="btn-primary">
-              Save Notifications
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

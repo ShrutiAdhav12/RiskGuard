@@ -1,12 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { applicationAPI } from '../../utils/api';
 
 export default function Sidebar({ onToggle, isOpen: externalIsOpen }) {
   const [internalIsOpen, setInternalIsOpen] = useState(true);
+  const [stats, setStats] = useState({
+    pending: 0,
+    highRisk: 0
+  });
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const { role } = useAuth();
   const location = useLocation();
+
+  // Load stats for notifications
+  useEffect(() => {
+    const loadStats = async () => {
+      if (role === 'underwriter') {
+        try {
+          const response = await applicationAPI.getAll();
+          const data = response.data || [];
+          setStats({
+            pending: data.filter(a => a.status === 'pending').length,
+            highRisk: data.filter(a => a.riskScore > 70).length
+          });
+        } catch (err) {
+          console.error('Failed to load stats:', err);
+        }
+      }
+    };
+    loadStats();
+  }, [role]);
 
   const handleToggle = () => {
     const newState = !isOpen;
@@ -27,6 +51,7 @@ export default function Sidebar({ onToggle, isOpen: externalIsOpen }) {
       return [
         { label: 'Dashboard', path: '/underwriter/dashboard' },
         { label: 'Pending Review', path: '/underwriter/pending' },
+        { label: 'Notifications', path: '/underwriter/notifications', badge: stats.pending + stats.highRisk },
         { label: 'Settings', path: '/underwriter/settings' }
       ];
     } else if (role === 'admin') {
@@ -53,16 +78,22 @@ export default function Sidebar({ onToggle, isOpen: externalIsOpen }) {
       </button>
       <nav className="mt-4">
         {items.map(item => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`sidebar-link ${
-              location.pathname === item.path ? 'active' : ''
-            } ${!isOpen && 'justify-center'}`}
-            title={!isOpen ? item.label : ''}
-          >
-            {isOpen ? item.label : item.label[0]}
-          </Link>
+          <div key={item.path} className="relative">
+            <Link
+              to={item.path}
+              className={`sidebar-link ${
+                location.pathname === item.path ? 'active' : ''
+              } ${!isOpen && 'justify-center'}`}
+              title={!isOpen ? item.label : ''}
+            >
+              <span>{isOpen ? item.label : item.label[0]}</span>
+              {item.badge && item.badge > 0 && (
+                <span className="ml-auto bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          </div>
         ))}
       </nav>
     </aside>

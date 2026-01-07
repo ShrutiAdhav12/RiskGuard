@@ -113,6 +113,26 @@ export const underwriterAPI = {
   }
 };
 
+// UNDERWRITER PREFERENCES OPERATIONS
+export const underwriterPreferencesAPI = {
+  getAll: () => api.get('/underwriterPreferences'),
+  getByUnderwriterId: (underwriterId) => api.get('/underwriterPreferences', {
+    params: { underwriterId }
+  }),
+  create: (data) => api.post('/underwriterPreferences', data),
+  update: (id, data) => api.put(`/underwriterPreferences/${id}`, data),
+};
+
+// UNDERWRITER RULES OPERATIONS
+export const underwriterRulesAPI = {
+  getAll: () => api.get('/underwriterRules'),
+  getByUnderwriterId: (underwriterId) => api.get('/underwriterRules', {
+    params: { underwriterId }
+  }),
+  create: (data) => api.post('/underwriterRules', data),
+  update: (id, data) => api.put(`/underwriterRules/${id}`, data),
+};
+
 // ADMIN OPERATIONS
 export const adminAPI = {
   login: (email, password) => {

@@ -270,6 +270,29 @@ tr:hover { background: #f9fafb; }
   border-left-color: white;
 }
 
+/* Notification Badge */
+.sidebar-link span:not(:first-child) {
+  background: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-left: auto;
+}
+
+/* Notification Badge Hover Effect */
+.sidebar-link:hover span:not(:first-child),
+.sidebar-link.active span:not(:first-child) {
+  background: #dc2626;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   h1 { font-size: 1.875rem; }
@@ -462,4 +485,60 @@ tr:hover { background: #f9fafb; }
   color: #155724;
 }
 
+/* NOTIFICATION PREFERENCES COMPONENT */
+.notification-preferences-section {
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
 
+.notification-badge-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.notification-badge-icon.email {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.notification-badge-icon.daily {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notification-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.notification-status-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  border: 1px solid;
+}
+
+.notification-status-message.enabled-blue {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
+.notification-status-message.enabled-green {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+}

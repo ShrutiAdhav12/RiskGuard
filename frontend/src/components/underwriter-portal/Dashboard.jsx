@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { applicationAPI } from '../../utils/api';
+import { applicationAPI, underwriterRulesAPI } from '../../utils/api';
 import { formatDate, getStatusBadge } from '../../utils/helpers';
-import { applyUnderwritingRules } from '../../utils/riskEngine';
 
 export default function UnderwriterDashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [underwritingRules, setUnderwritingRules] = useState([]);
   const [stats, setStats] = useState({
     pending: 0,
     approved: 0,
@@ -14,31 +14,63 @@ export default function UnderwriterDashboard() {
   });
 
   useEffect(() => {
-    const loadApplications = async () => {
+    const loadData = async () => {
       try {
-        const response = await applicationAPI.getAll();
-        const data = response.data || [];
-        setApplications(data);
+        // Load applications
+        const appResponse = await applicationAPI.getAll();
+        const appData = appResponse.data || [];
+        setApplications(appData);
 
         const newStats = {
-          pending: data.filter(a => a.status === 'pending').length,
-          approved: data.filter(a => a.status === 'approved').length,
-          rejected: data.filter(a => a.status === 'rejected').length,
-          highRisk: data.filter(a => a.riskScore > 70).length
+          pending: appData.filter(a => a.status === 'pending').length,
+          approved: appData.filter(a => a.status === 'approved').length,
+          rejected: appData.filter(a => a.status === 'rejected').length,
+          highRisk: appData.filter(a => a.riskScore > 70).length
         };
         setStats(newStats);
+
+        // Load rules from database
+        const rulesResponse = await underwriterRulesAPI.getAll();
+        const rulesData = rulesResponse.data || [];
+        if (rulesData.length > 0 && rulesData[0].rules) {
+          const rules = rulesData[0].rules.map(rule => ({
+            score: `${rule.scoreMin}-${rule.scoreMax}`,
+            decision: rule.decision,
+            label: rule.label,
+            discount: rule.premium,
+            rules: Array.isArray(rule.rules) ? rule.rules : [],
+            color: getColorByDecision(rule.decision)
+          }));
+          setUnderwritingRules(rules);
+        } else {
+          // Fallback to default rules if no database rules
+          setUnderwritingRules(getDefaultRules());
+        }
       } catch (err) {
-        console.error('Failed to load applications:', err);
+        console.error('Failed to load data:', err);
+        // Fallback to default rules on error
+        setUnderwritingRules(getDefaultRules());
       } finally {
         setLoading(false);
       }
     };
-    loadApplications();
+    loadData();
   }, []);
 
-  const pendingApps = applications.filter(a => a.status === 'pending');
+  const getColorByDecision = (decision) => {
+    switch (decision) {
+      case 'APPROVED':
+        return 'bg-green-100 text-green-700';
+      case 'REVIEW_REQUIRED':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'DECLINED':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
 
-  const underwritingRules = [
+  const getDefaultRules = () => [
     {
       score: '0-30',
       decision: 'APPROVED',
@@ -80,6 +112,8 @@ export default function UnderwriterDashboard() {
       rules: ['Automatic decline', 'Risk exceeds threshold', 'No coverage available']
     }
   ];
+
+  const pendingApps = applications.filter(a => a.status === 'pending');
 
   return (
     <div className="space-y-6">
