@@ -81,6 +81,7 @@ export default function CustomerSettings() {
     }
 
     setPasswordLoading(true);
+    setPasswordErrors({});
     try {
       // Verify current password by attempting to login
       const loginResponse = await customerAPI.login(user.email, passwordData.currentPassword);
@@ -109,8 +110,8 @@ export default function CustomerSettings() {
       const updatedUser = { ...user, password: passwordData.newPassword };
       await customerAPI.update(user.id, updatedUser);
       
-      // Update user in context and localStorage
-      updateUser(updatedUser);
+      // Clear errors before showing success
+      setPasswordErrors({});
 
       setPasswordSuccess(true);
       setPasswordData({
@@ -118,7 +119,6 @@ export default function CustomerSettings() {
         newPassword: '',
         confirmPassword: ''
       });
-      setPasswordErrors({});
 
       // Auto-logout after 2 seconds so user must re-login with new password
       setTimeout(() => {
@@ -130,7 +130,7 @@ export default function CustomerSettings() {
       if (err.response?.status === 404) {
         setPasswordErrors({ currentPassword: 'Current password is incorrect' });
       } else {
-        setPasswordErrors({ currentPassword: 'Error updating password. Please try again.' });
+        setPasswordErrors({ form: 'Error updating password. Please try again.' });
       }
     } finally {
       setPasswordLoading(false);

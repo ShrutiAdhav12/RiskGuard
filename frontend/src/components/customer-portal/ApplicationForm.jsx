@@ -5,12 +5,16 @@ import { INSURANCE_TYPES, COVERAGE_LEVELS } from '../../utils/constants';
 import { calculateRiskScore, calculatePremium, createRiskAssessment } from '../../utils/riskEngine';
 
 export default function ApplicationForm() {
-  const { user } = useAuth();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
+  const { user } = useAuth();
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+  
+  // Check if DOB is already set to lock it
+  const isDobLocked = !!user?.dob;
+  
+  const [formData, setFormData] = useState({
     // Step 1: Personal Details
     name: user?.name || '',
     dob: user?.dob || '',
@@ -344,23 +348,27 @@ export default function ApplicationForm() {
                     className={errors.name ? 'border-red-500' : ''}
                     required
                   />
-                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-                </div>
-                <div className="form-group">
-                  <label>Date of Birth *</label>
-                  <input
-                    type="date"
-                    name="dob"
-                    value={formData.dob}
-                    onChange={handleChange}
-                    className={errors.dob ? 'border-red-500' : ''}
-                    required
-                  />
-                  {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                </div>
+                <div className="form-group">
+                  <label>Date of Birth *</label>
+                  <input
+                    type="date"
+                    name="dob"
+                    value={formData.dob}
+                    onChange={handleChange}
+                    disabled={isDobLocked}
+                    className={`${errors.dob ? 'border-red-500' : ''} ${isDobLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    required
+                  />
+                  {isDobLocked && (
+                    <p className="text-amber-600 text-[10px] mt-1 italic font-medium">
+                      Note: Date of Birth cannot be changed once saved.
+                    </p>
+                  )}
+                  {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob}</p>}
+                </div>
+              </div>              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-group">
                   <label>Email Address *</label>
                   <input
