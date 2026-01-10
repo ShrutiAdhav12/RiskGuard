@@ -112,44 +112,60 @@ export default function ApplicationForm() {
   const ALLOWED_FILE_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'text/plain'];
   const ALLOWED_EXTENSIONS = ['.pdf', '.png', '.jpeg', '.jpg', '.txt'];
 
-  const handleDocumentChange = (e) => {
-    const files = Array.from(e.target.files);
-    let fileError = '';
-    const validFiles = [];
+  const handleDocumentChange = (e) => {
+    const files = Array.from(e.target.files);
+    let fileError = '';
+    const validFiles = [];
+    let filesProcessed = 0;
 
-    files.forEach(f => {
-      const fileExtension = '.' + f.name.split('.').pop().toLowerCase();
-      const isValidType = ALLOWED_FILE_TYPES.includes(f.type) || ALLOWED_EXTENSIONS.includes(fileExtension);
-      
-      if (!isValidType) {
-        fileError = `Invalid file type: ${f.name}. Only PDF, PNG, JPEG, JPG, and TXT files are allowed.`;
-      } else {
-        validFiles.push({ name: f.name, size: f.size, type: f.type });
-      }
-    });
+    files.forEach(f => {
+      const fileExtension = '.' + f.name.split('.').pop().toLowerCase();
+      const isValidType = ALLOWED_FILE_TYPES.includes(f.type) || ALLOWED_EXTENSIONS.includes(fileExtension);
+      
+      if (!isValidType) {
+        fileError = `Invalid file type: ${f.name}. Only PDF, PNG, JPEG, JPG, and TXT files are allowed.`;
+      } else {
+        // Read file content for preview
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          validFiles.push({ 
+            name: f.name, 
+            size: f.size, 
+            type: f.type,
+            content: event.target.result // base64 encoded content
+          });
+          filesProcessed++;
+          
+          // Update state after all files are read
+          if (filesProcessed === files.filter(file => {
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            return ALLOWED_FILE_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.includes(ext);
+          }).length) {
+            setFormData(prev => ({
+              ...prev,
+              documents: validFiles
+            }));
+          }
+        };
+        reader.readAsDataURL(f);
+      }
+    });
 
-    setFormData(prev => ({
-      ...prev,
-      documents: validFiles
-    }));
+    setErrors(prev => ({ ...prev, documents: fileError }));
+  };
 
-    setErrors(prev => ({ ...prev, documents: fileError }));
-  };
+  // Remove a document from the list
+  const handleRemoveDocument = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter((_, index) => index !== indexToRemove)
+    }));
+  };
 
-  // Remove a document from the list
-  const handleRemoveDocument = (indexToRemove) => {
-    setFormData(prev => ({
-      ...prev,
-      documents: prev.documents.filter((_, index) => index !== indexToRemove)
-    }));
-  };
-
-  // Check if step 4 is valid (documents uploaded)
-  const isStep4Valid = () => {
-    return formData.documents.length > 0;
-  };
-
-  // Check if step 1 is valid (without modifying state)
+  // Check if step 4 is valid (documents uploaded)
+  const isStep4Valid = () => {
+    return formData.documents.length > 0;
+  };  // Check if step 1 is valid (without modifying state)
   const isStep1Valid = () => {
     const nameError = validateName(formData.name);
     const contactError = validateContact(formData.contactInfo);

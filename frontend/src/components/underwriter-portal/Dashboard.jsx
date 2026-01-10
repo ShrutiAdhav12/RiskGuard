@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { applicationAPI, underwriterRulesAPI } from '../../utils/api';
 import { formatDate, getStatusBadge } from '../../utils/helpers';
 
 export default function UnderwriterDashboard() {
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [underwritingRules, setUnderwritingRules] = useState([]);
@@ -185,7 +187,7 @@ export default function UnderwriterDashboard() {
                         </span>
                       </td>
                       <td className="py-3">
-                        <button className="btn-primary text-sm">Review</button>
+                        <button onClick={() => navigate('/underwriter/pending')} className="btn-primary text-sm">Review</button>
                       </td>
                     </tr>
                   ))}

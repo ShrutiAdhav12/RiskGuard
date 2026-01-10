@@ -350,18 +350,69 @@ export default function ApplicationReview() {
                   </div>
                   )}
 
-                  {/* Medical Information */}
-                  {(app.medicalHistory || app.preExistingConditions || app.currentMedications) && (
+                  {/* Medical Information with Documents */}
+                  {(app.medicalHistory || app.preExistingConditions || app.currentMedications || (app.documents && app.documents.length > 0)) && (
                     <div className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
-                      <h4 className="font-semibold mb-2">Medical Information</h4>
-                      {app.preExistingConditions && (
-                        <p className="text-sm mb-2"><strong>Conditions:</strong> {app.preExistingConditions}</p>
+                      <h4 className="font-semibold mb-3">Medical Information & Documents</h4>
+                      
+                      {/* Medical History */}
+                      {(app.preExistingConditions || app.currentMedications || app.medicalHistory) && (
+                        <div className="mb-4 pb-4 border-b border-blue-200">
+                          {app.preExistingConditions && (
+                            <p className="text-sm mb-2"><strong>Conditions:</strong> {app.preExistingConditions}</p>
+                          )}
+                          {app.currentMedications && (
+                            <p className="text-sm mb-2"><strong>Medications:</strong> {app.currentMedications}</p>
+                          )}
+                          {app.medicalHistory && (
+                            <p className="text-sm"><strong>History:</strong> {app.medicalHistory}</p>
+                          )}
+                        </div>
                       )}
-                      {app.currentMedications && (
-                        <p className="text-sm mb-2"><strong>Medications:</strong> {app.currentMedications}</p>
-                      )}
-                      {app.medicalHistory && (
-                        <p className="text-sm"><strong>History:</strong> {app.medicalHistory}</p>
+
+                      {/* Uploaded Documents */}
+                      {app.documents && app.documents.length > 0 && (
+                        <div>
+                          <p className="font-semibold text-sm mb-3 text-blue-900">Uploaded Documents ({app.documents.length})</p>
+                          <div className="space-y-2">
+                            {app.documents.map((doc, idx) => (
+                              <div key={idx} className="flex items-center justify-between gap-3 text-sm bg-white p-3 rounded border border-blue-200 hover:bg-blue-50 transition">
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  <span className="text-lg">📎</span>
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-gray-800 truncate">{doc.name}</p>
+                                    <p className="text-xs text-gray-500">{(doc.size / 1024).toFixed(2)} KB • {doc.type}</p>
+                                  </div>
+                                </div>
+                                <button 
+                                  onClick={() => {
+                                    if (doc.content) {
+                                      // Create a blob from base64 and download/view it
+                                      try {
+                                        const link = document.createElement('a');
+                                        link.href = doc.content;
+                                        link.download = doc.name;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                      } catch (err) {
+                                        // If download fails, try opening in new tab
+                                        window.open(doc.content, '_blank');
+                                      }
+                                    } else {
+                                      alert(`Document "${doc.name}" was uploaded but the file content is not stored.\n\nPlease ask the customer to re-upload this document or upload a new one. New uploads will have preview support.`);
+                                    }
+                                  }}
+                                  className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-semibold whitespace-nowrap transition">
+                                  View Document
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-blue-600 mt-3 italic">
+                            ℹ️ {app.documents.map(d => d.name).join(', ')}
+                          </p>
+                        </div>
                       )}
                     </div>
                   )}

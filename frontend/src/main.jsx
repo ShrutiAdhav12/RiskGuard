@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
+import Payment from './pages/Payment';
 import CustomerDashboard from './components/customer-portal/Dashboard';
 import CustomerApplications from './components/customer-portal/ApplicationForm';
 import CustomerPolicies from './components/customer-portal/PolicyList';
@@ -37,7 +38,7 @@ function PortalLayout({ children }) {
         <Sidebar onToggle={setSidebarOpen} isOpen={sidebarOpen} />
         <div className={`flex-1 transition-all ${sidebarOpen ? 'ml-64 md:ml-64' : 'ml-20'}`}>
           <Navbar />
-          <main className="p-8 min-h-screen bg-gray-50 overflow-auto">
+          <main className="p-8 bg-gray-50 overflow-auto h-full">
             {children}
           </main>
         </div>
@@ -59,6 +60,7 @@ function App() {
           <Route path="/customer/dashboard" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerDashboard /></PortalLayout></ProtectedRoute>} />
           <Route path="/customer/applications" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerApplications /></PortalLayout></ProtectedRoute>} />
           <Route path="/customer/policies" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerPolicies /></PortalLayout></ProtectedRoute>} />
+          <Route path="/customer/payment" element={<ProtectedRoute requiredRole="customer"><PortalLayout><Payment /></PortalLayout></ProtectedRoute>} />
           <Route path="/customer/profile" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerProfile /></PortalLayout></ProtectedRoute>} />
           <Route path="/customer/settings" element={<ProtectedRoute requiredRole="customer"><PortalLayout><CustomerSettings /></PortalLayout></ProtectedRoute>} />
 
